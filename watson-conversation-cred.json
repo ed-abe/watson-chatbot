@@ -1,0 +1,21 @@
+{
+  "conversation": [
+    {
+      "credentials": {
+        "url": "https://gateway.watsonplatform.net/conversation/api",
+        "username": "47eb1054-ee68-486b-9be6-a43273673590",
+        "password": "M6oDfpq6DcRN"
+      },
+      "syslog_drain_url": null,
+      "label": "conversation",
+      "provider": null,
+      "plan": "free",
+      "name": "firebot",
+      "tags": [
+        "watson",
+        "ibm_created",
+        "ibm_dedicated_public"
+      ]
+    }
+  ]
+}

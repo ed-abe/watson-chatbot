@@ -1,0 +1,44 @@
+{
+  "intents": [
+    {
+      "intent": "introduction",
+      "confidence": 0.99
+    }
+  ],
+  "entities": [],
+  "input": {
+    "text": "Hello"
+  },
+  "output": {
+    "log_messages": [
+      {
+        "level": "err",
+        "msg": "SpelEvaluationException when evaluating DialogNode Id [node_3_1491388880842]. Condition [ #introduction && Firebot] evaluated to FALSE.\norg.springframework.expression.spel.SpelEvaluationException: EL1008E:(pos 31): Property or field 'Firebot' cannot be found on object of type 'com.ibm.watson.dialog.intp.impl.V2EvalContext' - maybe not public?\n"
+      }
+    ],
+    "text": [
+      "Hello! I am Firebot! What's your name?"
+    ],
+    "nodes_visited": [
+      "Introduction"
+    ],
+    "error": "SpelEvaluationException when evaluating DialogNode Id [node_3_1491388880842]. Condition [ #introduction && Firebot] evaluated to FALSE.\norg.springframework.expression.spel.SpelEvaluationException: EL1008E:(pos 31): Property or field 'Firebot' cannot be found on object of type 'com.ibm.watson.dialog.intp.impl.V2EvalContext' - maybe not public?\n"
+  },
+  "context": {
+    "conversation_id": "837cca97-9873-4d1c-a511-ecee609a9799",
+    "system": {
+      "dialog_stack": [
+        {
+          "dialog_node": "Introduction"
+        }
+      ],
+      "dialog_turn_counter": 1,
+      "dialog_request_counter": 1,
+      "_node_output_map": {
+        "node_14_1491389686464": [
+          0
+        ]
+      }
+    }
+  }
+}

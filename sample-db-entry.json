@@ -1,0 +1,16 @@
+{
+  "_id" : userName,
+  "_rev": "1-0",
+  "messages" : {
+    "brisinger" : {
+      "name" : "Firebot",
+      "text" : JSON.stringify(response.output.text),
+      "photoURL" : "placeholder-bot.png"
+    },
+    "eonet" : {
+      "name" : userName,
+      "text" : JSON.stringify(response.input.text),
+      "photoURL" : "placeholder-user.png"
+    }
+  }
+}
