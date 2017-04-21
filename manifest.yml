@@ -1,5 +1,0 @@
----
-applications:
- - name: firebot
-   random-route: true
-   memory: 256M
