@@ -15,11 +15,13 @@
     "url": "https://github.com/IBM-Bluemix/get-started-node"
   },
   "dependencies": {
+    "@slack/client": "^3.9.0",
     "body-parser": "^1.16.1",
     "cfenv": "^1.0.x",
     "cloudant": "^1.7.1",
     "dotenv": "^4.0.0",
     "express": "^4.14.1",
+    "slackbots": "^1.0.2",
     "watson-developer-cloud": "^2.28.1"
   },
   "author": "IBM Corp",

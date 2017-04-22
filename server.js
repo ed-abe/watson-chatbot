@@ -1,69 +1,10 @@
 var express = require("express");
 var app = express();
 var cfenv = require("cfenv");
-var bodyParser = require('body-parser')
 var watson = require('watson-developer-cloud');
-
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
-
-// parse application/json
-app.use(bodyParser.json())
-
-var mydb;
-
-/* Endpoint to greet and add a new visitor to database.
-* Send a POST request to localhost:3000/api/visitors with body
-* {
-* 	"name": "Bob"
-* }
-*/
-app.post("/api/visitors", function (request, response) {
-  var userName = request.body.name;
-  if(!mydb) {
-    console.log("No database.");
-    response.send("Hello " + userName + "!");
-    return;
-  }
-  // insert the username as a document
-  mydb.insert({ "name" : userName }, function(err, body, header) {
-    if (err) {
-      return console.log('[mydb.insert] ', err.message);
-    }
-    response.send("Hello " + userName + "! I added you to the database.");
-    const name = userName;
-    sendMessageToWatson(name);
-  });
-});
-
-/**
- * Endpoint to get a JSON array of all the visitors in the database
- * REST API example:
- * <code>
- * GET http://localhost:3000/api/visitors
- * </code>
- *
- * Response:
- * [ "Bob", "Jane" ]
- * @return An array of all the visitor names
- */
-app.get("/api/visitors", function (request, response) {
-  var names = [];
-  if(!mydb) {
-    response.json(names);
-    return;
-  }
-
-  mydb.list({ include_docs: true }, function(err, body) {
-    if (!err) {
-      body.rows.forEach(function(row) {
-        if(row.doc.name)
-          names.push(row.doc.name);
-      });
-      response.json(names);
-    }
-  });
-});
+var SlackBot = require('slackbots');
+var https = require('https')
+var WebClient = require('@slack/client').WebClient;
 
 
 // load local VCAP configuration  and service credentials
@@ -74,86 +15,85 @@ try {
 } catch (e) { }
 
 const appEnvOpts = vcapLocal ? { vcap: vcapLocal} : {}
-
 const appEnv = cfenv.getAppEnv(appEnvOpts);
 
-if (appEnv.services['cloudantNoSQLDB']) {
-  // Load the Cloudant library.
-  var Cloudant = require('cloudant');
+var token = process.env.SLACK_API_TOKEN || appEnv.services['slackbot'].token; //see section above on sensitive data
 
-  // Initialize database with credentials
-  var cloudant = Cloudant(appEnv.services['cloudantNoSQLDB'][0].credentials);
+var web = new WebClient(token);
 
-  //database name
-  var dbName = 'mydb';
+var conversation = watson.conversation(appEnv.services['watsonConversation'].firebot.loginInfo);
 
-  // Create a new "mydb" database.
-  cloudant.db.create(dbName, function(err, data) {
-    if(!err){ //err if database doesn't already exists
-      console.log("Created database: " + dbName);
-    }
-  });
+// Replace with the context obtained from the initial request
+var context = {};
 
-  // Specify the database we are going to use (mydb)...
-  mydb = cloudant.db.use(dbName);
-}
-
-//serve static file (index.html, images, css)
-app.use(express.static(__dirname + '/views'));
-
-
-
-var port = process.env.PORT || 3000
-app.listen(port, function() {
-    console.log("To view your app, open this link in your browser: http://localhost:" + port);
+var bot = new SlackBot(appEnv.services['slackbot']);
+bot.on('start', function() {
+    // more information about additional params https://api.slack.com/methods/chat.postMessage
+    console.log("Slackbot up and running");
 });
 
-function sendMessageToWatson(userName){
+bot.on('message', function(data) {
+    // all ingoing events https://api.slack.com/rtm
+    switch (data.type) {
+      case 'message':{
+          console.log("Message Recieved Response: "+JSON.stringify(data,null, 4));
+          if(data.channel && data.text && (!data.bot_id)){
+            sendMessageToWatson(data.channel, data.text, function(msgData){
+              console.log("sendMessageToWatson userName: "+msgData.target+"text: "+msgData.message);
+              for (var i = 0; i < msgData.message.length; i++) {
+                  if (msgData.message[i].length>0) {
+                    web.chat.postMessage(msgData.target, msgData.message[i],{"as_user":"true"} ,function(err, res) {
+                        if (err) {
+                          console.log("web.chat.postMessage Error: "+JSON.stringify(err,null, 4));
+                        } else {
+                          console.log("web.chat.postMessage Response: "+JSON.stringify(res,null, 4));
+                        }
+                    });
+                  }
+              }
+              for (var text in msgData.message) {
+              }
+                // bot.postMessageToChannel(msgData.target, msgData.message,{"as_user":"true"}, function(data){
+                //   console.log("bot.postMessageToUser Response: "+JSON.stringify(data,null, 4));
+                // });
+          });
+        }
+        break;
+      }
+      default:
+        break;
+    }
+});
+
+function sendMessageToWatson(userName, msg, callback){
   // Watson Conversation
-
-  var conversation = watson.conversation(appEnv.services['watsonConversation'].firebot.loginInfo);
-
-
-  // Replace with the context obtained from the initial request
-  var context = {};
   conversation.message({
-    workspace_id: '52dfc2e2-65c1-493e-82c6-0437bab278da', //firebot workspace_id
-    input: {'text': 'Hello'},
+    workspace_id: appEnv.services['watsonConversation'].firebot.workspace_id, //firebot workspace_id
+    input: {'text': msg},
     context: context
   },  function(err, response) {
     if (err)
-      console.log('error:', err);
+    console.log('error:', err);
     else{
-      console.log(JSON.stringify(response, null, 2));
+      console.log('sendMessageToWatson : Successful'+'\nResponse : '+JSON.stringify(response, null, 4));
       if(response.output.text && response.input.text){
-        var dbEntry;
-        mydb.get(userName, function(err, data) {
-            console.log("Error:", err);
-            console.log("Data:", data);
-            if(data){
-              var messageId1 = messageIdGenerator('brisinger6');
-              var messageId2 = messageIdGenerator('eonet6');
-              data.messages[messageId1] =   {
-                                                "name" : "Firebot",
-                                                "text" : JSON.stringify(response.output.text),
-                                                "photoURL" : "placeholder-bot.png"
-                                              };
-              data.messages[messageId2] =  {
-                                              "name" : userName,
-                                              "text" : JSON.stringify(response.input.text),
-                                              "photoURL" : "placeholder-user.png"
-                                             };
-              mydb.insert(data,userName, function(err, body, header) {
-                if (err) {
-                  return console.log('[mydb.insert] ', err.message);
-                }
-              });
-            }
-          });
+        msgData = {
+          "source": "Firebot",
+          "message": response.output.text,
+          "target": userName
+        };
+        context=response.context;
+        if(callback){
+          console.log('sendMessageToWatson : msgData'+JSON.stringify(msgData,null, 4));
+          callback(msgData);
+        } else {
+          console.log("sendMessageToWatson : callback not available");
+        }
       }
     }
   });
 }
+
  function messageIdGenerator(meta){
    return meta;
  }
