@@ -1,0 +1,4 @@
+{
+  "context": {
+    "userName": "<? input.text.extract('(is )([a-zA-Z]+)', 2) ?>"
+}
