@@ -26,7 +26,7 @@ function handleUserLeft(msg) {
 	$("select#users option[value='" + msg.userName + "']").remove();
 }
 
-socket = io.connect("http://localhost:3000");
+socket = io.connect("firebot.mybluemix.net",{secure:true});
 
 function setFeedback(fb) {
   $('span#feedback').html(fb);
