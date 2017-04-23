@@ -1,0 +1,19 @@
+{
+ "services": {
+   "watsonConversation":{
+     "firebot":{
+       "workspace_id" : "<workspace_id>",
+       "loginInfo" :{
+           "username": "<username>",
+           "password": "<password>",
+           "version": "<version>",
+           "version_date": "<version_date>"
+       }
+     }
+   },
+   "slackbot":{
+     "token":"<token>",
+     "name":"<bot_name>"
+   }
+ }
+}

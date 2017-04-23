@@ -1,0 +1,254 @@
+{
+  "name": "firebot",
+  "created": "2017-04-05T10:37:56.855Z",
+  "intents": [
+    {
+      "intent": "introduction",
+      "created": "2017-04-05T10:38:41.929Z",
+      "updated": "2017-04-23T02:17:41.146Z",
+      "examples": [
+        {
+          "text": "Allo",
+          "created": "2017-04-23T02:17:15.172Z",
+          "updated": "2017-04-23T02:17:15.172Z"
+        },
+        {
+          "text": "Greetings",
+          "created": "2017-04-05T10:38:41.929Z",
+          "updated": "2017-04-05T10:38:41.929Z"
+        },
+        {
+          "text": "Hello",
+          "created": "2017-04-05T10:38:41.929Z",
+          "updated": "2017-04-05T10:38:41.929Z"
+        },
+        {
+          "text": "Hey",
+          "created": "2017-04-23T02:17:41.146Z",
+          "updated": "2017-04-23T02:17:41.146Z"
+        },
+        {
+          "text": "Hi",
+          "created": "2017-04-05T10:38:41.929Z",
+          "updated": "2017-04-05T10:38:41.929Z"
+        }
+      ],
+      "description": null
+    },
+    {
+      "intent": "userNameInput",
+      "created": "2017-04-21T23:27:00.287Z",
+      "updated": "2017-04-23T02:18:15.906Z",
+      "examples": [
+        {
+          "text": "I am",
+          "created": "2017-04-21T23:27:52.693Z",
+          "updated": "2017-04-21T23:27:52.693Z"
+        },
+        {
+          "text": "I am called",
+          "created": "2017-04-21T23:27:39.704Z",
+          "updated": "2017-04-21T23:27:39.704Z"
+        },
+        {
+          "text": "I am named",
+          "created": "2017-04-23T02:18:02.978Z",
+          "updated": "2017-04-23T02:18:02.978Z"
+        },
+        {
+          "text": "I call myself",
+          "created": "2017-04-23T02:18:15.906Z",
+          "updated": "2017-04-23T02:18:15.906Z"
+        },
+        {
+          "text": "My name is",
+          "created": "2017-04-21T23:27:46.132Z",
+          "updated": "2017-04-21T23:27:46.132Z"
+        }
+      ],
+      "description": null
+    },
+    {
+      "intent": "weather",
+      "created": "2017-04-22T00:47:56.798Z",
+      "updated": "2017-04-22T19:33:22.428Z",
+      "examples": [
+        {
+          "text": "climate",
+          "created": "2017-04-22T19:33:22.428Z",
+          "updated": "2017-04-22T19:33:22.428Z"
+        },
+        {
+          "text": "How's the climate?",
+          "created": "2017-04-22T19:32:52.533Z",
+          "updated": "2017-04-22T19:32:52.533Z"
+        },
+        {
+          "text": "How's the @weather?",
+          "created": "2017-04-22T00:47:56.798Z",
+          "updated": "2017-04-22T00:47:56.798Z"
+        },
+        {
+          "text": "What is the climate?",
+          "created": "2017-04-22T19:33:18.745Z",
+          "updated": "2017-04-22T19:33:18.745Z"
+        },
+        {
+          "text": "Whats the @weather like?",
+          "created": "2017-04-22T00:47:56.798Z",
+          "updated": "2017-04-22T00:47:56.798Z"
+        },
+        {
+          "text": "Whats the weather like?",
+          "created": "2017-04-22T00:47:56.798Z",
+          "updated": "2017-04-22T19:32:37.610Z"
+        }
+      ],
+      "description": null
+    }
+  ],
+  "updated": "2017-04-23T02:20:37.593Z",
+  "entities": [
+    {
+      "entity": "weather",
+      "values": [
+        {
+          "value": "weather",
+          "created": "2017-04-22T00:48:39.001Z",
+          "updated": "2017-04-22T00:48:39.001Z",
+          "metadata": null,
+          "synonyms": [
+            "climate"
+          ]
+        }
+      ],
+      "created": "2017-04-22T00:48:39.001Z",
+      "updated": "2017-04-22T00:48:39.001Z",
+      "metadata": null,
+      "description": null
+    }
+  ],
+  "language": "en",
+  "metadata": null,
+  "description": "Chatbot for multiple uses Weather, Small Talk, etc",
+  "dialog_nodes": [
+    {
+      "go_to": null,
+      "output": {},
+      "parent": null,
+      "context": null,
+      "created": "2017-04-05T10:40:27.334Z",
+      "updated": "2017-04-22T19:58:44.170Z",
+      "metadata": null,
+      "conditions": "#introduction",
+      "description": null,
+      "dialog_node": "Introduction",
+      "previous_sibling": null
+    },
+    {
+      "go_to": null,
+      "output": {},
+      "parent": "Greet User",
+      "context": null,
+      "created": "2017-04-22T00:45:16.213Z",
+      "updated": "2017-04-22T00:51:27.054Z",
+      "metadata": null,
+      "conditions": "#weather",
+      "description": null,
+      "dialog_node": "Weather",
+      "previous_sibling": null
+    },
+    {
+      "go_to": null,
+      "output": {
+        "text": {
+          "values": [
+            "Hi $userName. What do you want to talk about?"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "Introduction",
+      "context": {
+        "userName": "<? input.text ?>"
+      },
+      "created": "2017-04-21T23:55:25.976Z",
+      "updated": "2017-04-22T20:02:05.510Z",
+      "metadata": null,
+      "conditions": "TRUE",
+      "description": null,
+      "dialog_node": "Greet User",
+      "previous_sibling": null
+    },
+    {
+      "go_to": null,
+      "output": {
+        "text": {
+          "values": [
+            "Weather at $location is coming soon"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "Weather",
+      "context": {
+        "location": "<? input.text ?>"
+      },
+      "created": "2017-04-22T00:55:16.637Z",
+      "updated": "2017-04-22T19:56:06.675Z",
+      "metadata": null,
+      "conditions": "TRUE",
+      "description": null,
+      "dialog_node": "Weather at location",
+      "previous_sibling": null
+    },
+    {
+      "type": "response_condition",
+      "go_to": null,
+      "output": {
+        "text": {
+          "values": [
+            "Give me the location.",
+            "Tell me which location to check the weather",
+            "Where do you want to check weather?"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "Weather",
+      "context": null,
+      "created": "2017-04-22T00:51:26.871Z",
+      "updated": "2017-04-22T19:55:55.888Z",
+      "metadata": null,
+      "conditions": " ",
+      "description": null,
+      "dialog_node": "node_14_1492822286602",
+      "previous_sibling": "Weather at location"
+    },
+    {
+      "type": "response_condition",
+      "go_to": null,
+      "output": {
+        "text": {
+          "values": [
+            "Hello! I am Firebot! What's your name?",
+            "Hi! I am Firebot! What's your name?",
+            "I am Firebot! Please to meet you! What's your name?"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "Introduction",
+      "context": null,
+      "created": "2017-04-05T10:54:46.803Z",
+      "updated": "2017-04-21T23:35:53.257Z",
+      "metadata": null,
+      "conditions": " #introduction",
+      "description": null,
+      "dialog_node": "node_14_1491389686464",
+      "previous_sibling": "Greet User"
+    }
+  ],
+  "workspace_id": "52dfc2e2-65c1-493e-82c6-0437bab278da",
+  "counterexamples": []
+}
