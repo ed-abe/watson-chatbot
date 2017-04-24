@@ -1,0 +1,237 @@
+{
+  "request": "curl -X GET --header 'Accept: application/json' 'https://54276f1d-e0c8-4566-bff4-83d248ba1557:ufnW5g9QqK@twcservice.mybluemix.net/api/weather/v3/location/search?query=washington&language=en-US'",
+  "response": {
+    "location": {
+      "address": [
+        "Washington, United States",
+        "Washington, District of Columbia, United States",
+        "Washington Heights, Manhattan, New York City, New York 10033, United States",
+        "Washington Avenue Coalition - Memorial Park, Houston, Texas 77007, United States",
+        "Washington, Pennsylvania, United States",
+        "Washington Square, Huntington, West Virginia 25703, United States",
+        "Washington Square, Philadelphia, Pennsylvania 19107, United States",
+        "Washington, Sunderland, England, United Kingdom",
+        "Washington, North Carolina, United States",
+        "Washington Court House, Ohio, United States"
+      ],
+      "adminDistrict": [
+        "Washington",
+        "District of Columbia",
+        "New York",
+        "Texas",
+        "Pennsylvania",
+        "West Virginia",
+        "Pennsylvania",
+        "England",
+        "North Carolina",
+        "Ohio"
+      ],
+      "adminDistrictCode": [
+        "WA",
+        "DC",
+        "NY",
+        "TX",
+        "PA",
+        "WV",
+        "PA",
+        null,
+        "NC",
+        "OH"
+      ],
+      "city": [
+        null,
+        "Washington",
+        "New York City",
+        "Houston",
+        "Washington",
+        "Huntington",
+        "Philadelphia",
+        "Washington",
+        "Washington",
+        "Washington Court House"
+      ],
+      "country": [
+        "United States",
+        "United States",
+        "United States",
+        "United States",
+        "United States",
+        "United States",
+        "United States",
+        "United Kingdom",
+        "United States",
+        "United States"
+      ],
+      "countryCode": [
+        "US",
+        "US",
+        "US",
+        "US",
+        "US",
+        "US",
+        "US",
+        "GB",
+        "US",
+        "US"
+      ],
+      "displayName": [
+        "Washington",
+        "Washington",
+        "New York",
+        "Houston",
+        "Washington",
+        "Huntington",
+        "Philadelphia",
+        "Washington",
+        "Washington",
+        "Washington Court House"
+      ],
+      "ianaTimeZone": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "latitude": [
+        47.283,
+        38.895,
+        40.85,
+        29.773,
+        40.174,
+        38.417,
+        39.948,
+        54.9,
+        35.549,
+        39.536
+      ],
+      "locale": [
+        {
+          "locale1": null,
+          "locale2": null,
+          "locale3": null,
+          "locale4": null
+        },
+        {
+          "locale1": "Washington",
+          "locale2": null,
+          "locale3": null,
+          "locale4": null
+        },
+        {
+          "locale1": "New York City",
+          "locale2": "Manhattan",
+          "locale3": null,
+          "locale4": "Washington Heights"
+        },
+        {
+          "locale1": "Houston",
+          "locale2": null,
+          "locale3": null,
+          "locale4": "Washington Avenue Coalition - Memorial Park"
+        },
+        {
+          "locale1": "Washington",
+          "locale2": null,
+          "locale3": null,
+          "locale4": null
+        },
+        {
+          "locale1": "Huntington",
+          "locale2": null,
+          "locale3": null,
+          "locale4": "Washington Square"
+        },
+        {
+          "locale1": "Philadelphia",
+          "locale2": null,
+          "locale3": null,
+          "locale4": "Washington Square"
+        },
+        {
+          "locale1": "Washington",
+          "locale2": null,
+          "locale3": "Sunderland",
+          "locale4": null
+        },
+        {
+          "locale1": "Washington",
+          "locale2": null,
+          "locale3": null,
+          "locale4": null
+        },
+        {
+          "locale1": "Washington Court House",
+          "locale2": null,
+          "locale3": null,
+          "locale4": null
+        }
+      ],
+      "longitude": [
+        -120.76,
+        -77.037,
+        -73.935,
+        -95.396,
+        -80.246,
+        -82.428,
+        -75.16,
+        -1.52,
+        -77.054,
+        -83.439
+      ],
+      "neighborhood": [
+        null,
+        null,
+        "Washington Heights",
+        "Washington Avenue Coalition - Memorial Park",
+        null,
+        "Washington Square",
+        "Washington Square",
+        null,
+        null,
+        null
+      ],
+      "placeId": [
+        "6a6d49fe18d1264c59053fb50885778d626e4f7efe629ea1cf1b689f993dd546",
+        "303b0e8e1241fc4aa6917782fcb6acc5a4daeccb043c9fc0a046c95a88ee01d8",
+        "52e56e7124ea652a39dda2ff30fc04fa26a78f2c011885602c59adca4d11f5e2",
+        "06701978450f2ddcf2d9f1ca847d030fbeb92a22630ca0d7f14e0d245c2f71d5",
+        "1a39b6743303627b03bcde4eb8adceea16bc381325c7d808ea7cc6a9aa60b6ca",
+        "7e4007be18928db3473575a278b9de8bfe470276ce231bf66005acd5eb9bbcf4",
+        "4756cefcf8e0bb36bba2ca6cdbe88b95111be6bd2a41b30e5be1b43cd4914523",
+        "c22ad30f5f6134e302c9e8f9d92e459d0d69f46f14344f5fa4dd0f80550e19bb",
+        "d9ad9aaee4239fad414b4bdbd857d6607b6d1590061f5e84d0aadc151af5f1b3",
+        "327bc7484c30f4cb6539be3dc520e583470dede72583dd9ee8c69894b942873d"
+      ],
+      "postalCode": [
+        null,
+        "20004",
+        "10033",
+        "77007",
+        "15301",
+        "25703",
+        "19107",
+        "NE38 7LG",
+        "27889",
+        "43160"
+      ],
+      "postalKey": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  }
+}

@@ -6,7 +6,6 @@ var SlackBot = require('slackbots');
 var https = require('https')
 var WebClient = require('@slack/client').WebClient;
 
-
 // load local VCAP configuration  and service credentials
 var vcapLocal;
 try {
@@ -17,6 +16,7 @@ try {
 
 const appEnvOpts = vcapLocal ? { vcap: vcapLocal} : {};
 var appEnv;// = cfenv.getAppEnv(appEnvOpts);
+var weather = require('./weather');
 
 console.log("appEnv.services: ", appEnv);
 var appServices = vcapLocal?vcapLocal:appEnv.services;
@@ -52,7 +52,7 @@ bot.on('message', function(data) {
           if(data.channel && data.text && (!data.bot_id)){
             sendMessageToWatson(data.channel, data.text, function(msgData){
               if(context.location.length>0){
-                
+
               }
               console.log("sendMessageToWatson userName: "+msgData.target+"text: "+msgData.message);
               for (var i = 0; i < msgData.message.length; i++) {
@@ -108,7 +108,9 @@ function sendMessageToWatson(userName, msg, callback){
     }
   });
 }
+function getGeoCode(queryString){
 
+}
  function messageIdGenerator(meta){
    return meta;
  }
