@@ -1,5 +1,6 @@
 ---
 applications:
- - name: firebot
+ - name: watson-chatbot
    random-route: true
    memory: 256M
+   timeout: 180

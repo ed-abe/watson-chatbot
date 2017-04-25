@@ -14,19 +14,31 @@ try {
   console.log("Loaded local VCAP", vcapLocal);
 } catch (e) { }
 
-const appEnvOpts = vcapLocal ? { vcap: vcapLocal} : {}
-const appEnv = cfenv.getAppEnv(appEnvOpts);
 
-var token = process.env.SLACK_API_TOKEN || appEnv.services['slackbot'].token; //see section above on sensitive data
+const appEnvOpts = vcapLocal ? { vcap: vcapLocal} : {};
+var appEnv;// = cfenv.getAppEnv(appEnvOpts);
 
-var web = new WebClient(token);
+console.log("appEnv.services: ", appEnv);
+var appServices = vcapLocal?vcapLocal:appEnv.services;
 
-var conversation = watson.conversation(appEnv.services['watsonConversation'].firebot.loginInfo);
+var web = new WebClient(process.env.slackbot_token||appServices.slackbot_token);
+var conv_config = {
+                      "username": (process.env.cusername||appServices.cusername),
+                      "password": (process.env.cpassword||appServices.cpassword),
+                      "version": "v1",
+                      "version_date": "2017-02-03"
+                    };
+
+console.log("conv_config: ", conv_config);
+var conversation = watson.conversation(conv_config);
 
 // Replace with the context obtained from the initial request
 var context = {};
-
-var bot = new SlackBot(appEnv.services['slackbot']);
+console.log("Slack Token: "+(process.env.slackbot_token||appServices.slackbot_token)+ " Slack Bot Name"+ (process.env.slackbot_name||appServices.slackbot_name));
+var bot = new SlackBot({
+  "token": (process.env.slackbot_token||appServices.slackbot_token),
+  "name": (process.env.slackbot_name||appServices.slackbot_name)
+});
 bot.on('start', function() {
     // more information about additional params https://api.slack.com/methods/chat.postMessage
     console.log("Slackbot up and running");
@@ -39,6 +51,9 @@ bot.on('message', function(data) {
           console.log("Message Recieved Response: "+JSON.stringify(data,null, 4));
           if(data.channel && data.text && (!data.bot_id)){
             sendMessageToWatson(data.channel, data.text, function(msgData){
+              if(context.location.length>0){
+                
+              }
               console.log("sendMessageToWatson userName: "+msgData.target+"text: "+msgData.message);
               for (var i = 0; i < msgData.message.length; i++) {
                   if (msgData.message[i].length>0) {
@@ -68,7 +83,7 @@ bot.on('message', function(data) {
 function sendMessageToWatson(userName, msg, callback){
   // Watson Conversation
   conversation.message({
-    workspace_id: appEnv.services['watsonConversation'].firebot.workspace_id, //firebot workspace_id
+    workspace_id: (process.env.conversation_workspace_id||appServices.conversation_workspace_id),
     input: {'text': msg},
     context: context
   },  function(err, response) {
