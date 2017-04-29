@@ -1,18 +1,13 @@
 {
-  "name": "get-started-node",
+  "name": "watson-chatbot",
   "main": "server.js",
-  "description": "An introduction to developing Node.js apps on the Bluemix platform",
-  "version": "0.1.1",
+  "description": "A rudimentry chatbot linked to Slack",
   "private": false,
   "engines": {
     "node": "4.*"
   },
   "scripts": {
     "start": "node server.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/IBM-Bluemix/get-started-node"
   },
   "dependencies": {
     "@slack/client": "^3.9.0",
@@ -24,6 +19,5 @@
     "slackbots": "^1.0.2",
     "watson-developer-cloud": "^2.28.1"
   },
-  "author": "IBM Corp",
-  "license": "Apache-2.0"
+  "author": "Edwin"
 }

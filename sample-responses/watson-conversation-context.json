@@ -1,4 +1,18 @@
 {
   "context": {
     "userName": "<? input.text.extract('(is )([a-zA-Z]+)', 2) ?>"
+  },
+  "context": {
+    "userName": "<? input.text.extract('[My name is | I am | I am called]([a-zA-Z]+)', 1) ?>"
+  },
+  "output": {
+    "text": {
+      "values": [
+        "Hello $userName! What's your name?",
+        "Hi $userName! Can you tell me your name?",
+        "I am Firebot! Please to meet you $userName!"
+      ],
+      "selection_policy": "random"
+    }
+  }
 }

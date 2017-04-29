@@ -5,78 +5,99 @@ var watson = require('watson-developer-cloud');
 var SlackBot = require('slackbots');
 var https = require('https')
 var WebClient = require('@slack/client').WebClient;
-
+var request = require('request');
 
 // load local VCAP configuration  and service credentials
 var vcapLocal;
 try {
   vcapLocal = require('./vcap-local.json');
-  console.log("Loaded local VCAP", vcapLocal);
+  // console.log("Loaded local VCAP", vcapLocal);
 } catch (e) { }
 
-const appEnvOpts = vcapLocal ? { vcap: vcapLocal} : {}
-const appEnv = cfenv.getAppEnv(appEnvOpts);
 
-var token = process.env.SLACK_API_TOKEN || appEnv.services['slackbot'].token; //see section above on sensitive data
+const appEnvOpts = vcapLocal ? { vcap: vcapLocal} : {};
+var appEnv;// = cfenv.getAppEnv(appEnvOpts);
+// var weather = require('./weather');
 
-var web = new WebClient(token);
+// console.log("appEnv.services: ", appEnv);
+var appServices = vcapLocal?vcapLocal:appEnv.services;
 
-var conversation = watson.conversation(appEnv.services['watsonConversation'].firebot.loginInfo);
+var web = new WebClient(process.env.slackbot_token||appServices.slackbot_token);
+var conv_config = {
+  "username": (process.env.cusername||appServices.cusername),
+  "password": (process.env.cpassword||appServices.cpassword),
+  "version": "v1",
+  "version_date": "2017-02-03"
+};
+
+console.log("conv_config: ", conv_config);
+var conversation = watson.conversation(conv_config);
 
 // Replace with the context obtained from the initial request
 var context = {};
+console.log("Slack Token: "+(process.env.slackbot_token||appServices.slackbot_token)+ " Slack Bot Name"+ (process.env.slackbot_name||appServices.slackbot_name));
+var bot = new SlackBot({
+  "token": (process.env.slackbot_token||appServices.slackbot_token),
+  "name": (process.env.slackbot_name||appServices.slackbot_name)
+});
 
-var bot = new SlackBot(appEnv.services['slackbot']);
+// Slackbot Socket.io callbacks
+// 'start' : Slackbot has started up
 bot.on('start', function() {
-    // more information about additional params https://api.slack.com/methods/chat.postMessage
-    console.log("Slackbot up and running");
+  // more information about additional params https://api.slack.com/methods/chat.postMessage
+  console.log("Slackbot up and running");
 });
 
+// 'message' : Slackbot has recieved a message regarding an activity
 bot.on('message', function(data) {
-    // all ingoing events https://api.slack.com/rtm
-    switch (data.type) {
-      case 'message':{
-          console.log("Message Recieved Response: "+JSON.stringify(data,null, 4));
-          if(data.channel && data.text && (!data.bot_id)){
-            sendMessageToWatson(data.channel, data.text, function(msgData){
-              console.log("sendMessageToWatson userName: "+msgData.target+"text: "+msgData.message);
-              for (var i = 0; i < msgData.message.length; i++) {
-                  if (msgData.message[i].length>0) {
-                    web.chat.postMessage(msgData.target, msgData.message[i],{"as_user":"true"} ,function(err, res) {
-                        if (err) {
-                          console.log("web.chat.postMessage Error: "+JSON.stringify(err,null, 4));
-                        } else {
-                          console.log("web.chat.postMessage Response: "+JSON.stringify(res,null, 4));
-                        }
-                    });
-                  }
-              }
-              for (var text in msgData.message) {
-              }
-                // bot.postMessageToChannel(msgData.target, msgData.message,{"as_user":"true"}, function(data){
-                //   console.log("bot.postMessageToUser Response: "+JSON.stringify(data,null, 4));
-                // });
-          });
+  // all ingoing events https://api.slack.com/rtm
+  switch (data.type) {
+    // 'message' : Slackbot has recieved a message from user
+    case 'message':{
+      console.log("Message Recieved Response: "+JSON.stringify(data,null, 4));
+      if(data.channel && data.text && (!data.bot_id)){
+        if(data.text == ":clear"){
+          context={};
+          data.text = "";
+          console.log(":clear Context cleared");
         }
-        break;
+        sendMessageToWatson(data.channel, data.text);
       }
-      default:
-        break;
+      break;
     }
+    default:
+      break;
+  }
 });
 
+// sendMessageToSlack : handles sending message to Slack
+function sendMessageToSlack(target,message,options){
+  var WebClient = require('@slack/client').WebClient;
+  var webClient = new WebClient(process.env.slackbot_token||appServices.slackbot_token);
+  webClient.chat.postMessage(target, message,options ,function(err, res) {
+    if (err) {
+      console.log("web.chat.postMessage Error: "+JSON.stringify(err,null, 4));
+    } else {
+      console.log("web.chat.postMessage Response: "+JSON.stringify(res,null, 4));
+    }
+  });
+}
+
+// sendMessageToWatson : handles sending message to Watson Conversation and it also handles its response to user
 function sendMessageToWatson(userName, msg, callback){
   // Watson Conversation
+  console.log("About to sendMessageToWatson name: "+userName+" msg: "+msg);
   conversation.message({
-    workspace_id: appEnv.services['watsonConversation'].firebot.workspace_id, //firebot workspace_id
+    workspace_id: (process.env.conversation_workspace_id||appServices.conversation_workspace_id),
     input: {'text': msg},
+    //TODO: context retrieval for user
     context: context
   },  function(err, response) {
     if (err)
     console.log('error:', err);
     else{
       console.log('sendMessageToWatson : Successful'+'\nResponse : '+JSON.stringify(response, null, 4));
-      if(response.output.text && response.input.text){
+      if(response.output.text){
         msgData = {
           "source": "Firebot",
           "message": response.output.text,
@@ -87,13 +108,120 @@ function sendMessageToWatson(userName, msg, callback){
           console.log('sendMessageToWatson : msgData'+JSON.stringify(msgData,null, 4));
           callback(msgData);
         } else {
-          console.log("sendMessageToWatson : callback not available");
+          console.log("sendMessageToWatson : reporting to messageSentToWatson");
+          messageSentToWatson(msgData);
         }
       }
     }
   });
 }
 
- function messageIdGenerator(meta){
-   return meta;
- }
+// messageSentToWatson : Callback of sending message to Watson Conversation
+function messageSentToWatson(msgData){
+  if(context.location && context.location.length>0){
+    handleWeather(context.location,msgData);
+  } else {
+    console.log("sendMessageToWatson userName: "+msgData.target+"text: "+msgData.message);
+    for (var i = 0; i < msgData.message.length; i++) {
+      if (msgData.message[i].length>0) {
+        sendMessageToSlack(msgData.target, msgData.message[i],{"as_user":"true"});
+      }
+    }
+  }
+}
+
+function handleWeather(location, msgData){
+    //TODO: Handle weather as an object
+    console.log("About to get location");
+    getGeoCode((process.env||appServices),context.location, function(data){
+      if(data.latitude[0]&&data.longitude[0]){
+        //TODO: Handle Multiple Locations
+          console.log("Location identified Lat:"+data.latitude[0]+" Lon"+data.longitude[0]);
+          console.log("About to get weather");
+        getWeather((process.env||appServices),data.latitude[0],data.longitude[0], function(weatherData){
+          var text = "";
+          if(!weatherData){
+            text = ("Couldn't get weather at"+weatherData.address[0]);
+            console.log("Couldn't get weather");
+            sendMessageToSlack(msgData.target, text,{"as_user":"true"} );
+          }else{
+            context.location="";
+            context.weather=weatherData;
+          }
+          sendMessageToWatson(msgData.target, text);
+        });
+      }else{
+        console.log("Couldn't find location");
+        sendMessageToSlack(msgData.target, "Couldn't find location" ,{"as_user":"true"} );
+      }
+    });
+}
+
+function weatherAPI(res, done) {
+  console.log(res);
+  request(res, function(err, req, data) {
+    console.log('req:'+JSON.stringify(req,null, 4));
+    if (err) {
+      done(err,null);
+    } else {
+      if (req.statusCode >= 200 && req.statusCode < 400) {
+        try {
+          done(null, JSON.parse(data));
+        } catch(e) {
+          console.log(e);
+          done(e,null);
+        }
+      } else {
+        console.log(err);
+        done({ message: req.statusCode, data: data },null);
+      }
+    }
+  });
+}
+
+function getGeoCode(appEnv,queryString,done){
+  var path = "v3/location/search";//?query="+queryString+"&language=en-US"
+  var url = appServices.weatherinsightsURL + path;
+  console.log('url:'+url);
+  var qs = {
+    query : queryString,
+    language: "en-US"
+  }
+  var res={
+    url: url,
+    method: "GET",
+    headers: {
+      "Accept": "application/json"
+    },
+    qs: qs
+  }
+  weatherAPI(res, function(err,data){
+    console.log('url:'+url+' response:'+JSON.stringify(data,null, 4));
+    if(data)
+    done(data.location);
+  });
+}
+
+//
+// curl -X GET --header 'Accept: application/json' 'https://54276f1d-e0c8-4566-bff4-83d248ba1557:ufnW5g9QqK@twcservice.mybluemix.net/api/weather/v1/geocode/47.283/-120.76/forecast/hourly/48hour.json'
+//
+function getWeather(appEnv,lat,lon,done){
+  var path = "v1/geocode/"+lat+"/"+lon+"/forecast/hourly/48hour.json";
+  var url = appServices.weatherinsightsURL + path;
+  console.log('url:'+url);
+  var res={
+    url: url,
+    method: "GET",
+    headers: {
+      "Accept": "application/json"
+    }
+  }
+  weatherAPI(res, function(err,data){
+    console.log('url:'+url+' response:'+JSON.stringify(data,null, 4));
+    if(data)
+    done(data.forecasts[0].phrase_32char+" with Temperature "+data.forecasts[0].temp);
+  });
+}
+function messageIdGenerator(meta){
+  return meta;
+}
